@@ -1,0 +1,20 @@
+# Visual Studio
+.vs/
+
+# Build output
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Debug / Release
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+# Logs
+*.log
