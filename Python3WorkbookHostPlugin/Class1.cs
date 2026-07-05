@@ -2,11 +2,10 @@
 using System.Drawing;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using UnicornOne.Workbook;
+using UnicornOne.Abstractions.Workbook;
 
 namespace Python3WorkbookHostPlugin
 {
@@ -159,18 +158,14 @@ namespace Python3WorkbookHostPlugin
                 uoBaseUrl = "http://127.0.0.1:5050"
             };
 
-            string json = JsonSerializer.Serialize(payload);
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+
             using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
+            using (var response = await _http.PostAsync($"{_pythonBaseUrl}/initialize", content).ConfigureAwait(false))
             {
-                using (var response = await _http.PostAsync($"{_pythonBaseUrl}/initialize", content).ConfigureAwait(false))
-                {
-                    response.EnsureSuccessStatusCode();
-                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                }
- 
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
-               
-         
         }
 
         private async Task<string> RunPythonAsync(CancellationToken token)
@@ -181,16 +176,14 @@ namespace Python3WorkbookHostPlugin
                 whenUtc = DateTime.UtcNow
             };
 
-            string json = JsonSerializer.Serialize(payload);
-            using (var content = new StringContent(json, Encoding.UTF8, "application/json")) {
-                using (var response = await _http.PostAsync($"{_pythonBaseUrl}/run", content, token)) {
-                    response.EnsureSuccessStatusCode();
-                    return await response.Content.ReadAsStringAsync();
-                }   
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+
+            using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
+            using (var response = await _http.PostAsync($"{_pythonBaseUrl}/run", content, token).ConfigureAwait(false))
+            {
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
-           
-
-
         }
 
         private async Task<string> CancelPythonAsync()
@@ -200,17 +193,14 @@ namespace Python3WorkbookHostPlugin
                 requestedAtUtc = DateTime.UtcNow
             };
 
-            string json = JsonSerializer.Serialize(payload);
-            using (var content = new StringContent(json, Encoding.UTF8, "application/json")) {
-                using (var response = await _http.PostAsync($"{_pythonBaseUrl}/cancel", content))
-                {
-                    response.EnsureSuccessStatusCode();
-                    return await response.Content.ReadAsStringAsync();
-                }
-            }
-         
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
 
-    
+            using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
+            using (var response = await _http.PostAsync($"{_pythonBaseUrl}/cancel", content).ConfigureAwait(false))
+            {
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
         }
 
         public void Dispose()
